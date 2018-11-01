@@ -24,10 +24,11 @@
  */
 package net.runelite.client.plugins.loottracker;
 
+import java.io.Serializable;
 import lombok.Value;
 
 @Value
-class LootTrackerRecord
+class LootTrackerRecord implements Serializable
 {
 	private final String title;
 	private final String subTitle;
