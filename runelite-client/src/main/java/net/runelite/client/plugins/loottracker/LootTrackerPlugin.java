@@ -187,8 +187,6 @@ public class LootTrackerPlugin extends Plugin
 		final String name = npc.getName();
 		final int combat = npc.getCombatLevel();
 		final LootTrackerItem[] entries = buildEntries(stack(items));
-
-
 		SwingUtilities.invokeLater(() -> panel.add(name, combat, entries));
 	}
 

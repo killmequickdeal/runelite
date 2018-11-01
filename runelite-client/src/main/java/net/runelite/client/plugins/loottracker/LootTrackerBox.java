@@ -171,7 +171,7 @@ class LootTrackerBox extends JPanel
 		final long kills = getTotalKills();
 		if (kills > 1)
 		{
-			subTitleLabel.setText("- " + StackFormatter.quantityToStackSize(totalPrice/kills) + " gp/kill - " + kills);
+			subTitleLabel.setText("x " + kills);
 		}
 
 		repaint();
@@ -186,6 +186,7 @@ class LootTrackerBox extends JPanel
 		final List<LootTrackerItem> allItems = new ArrayList<>();
 		final List<LootTrackerItem> items = new ArrayList<>();
 		totalPrice = 0;
+
 		for (LootTrackerRecord record : records)
 		{
 			allItems.addAll(Arrays.asList(record.getItems()));
