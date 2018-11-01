@@ -24,12 +24,13 @@
  */
 package net.runelite.client.plugins.loottracker;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @AllArgsConstructor
-class LootTrackerItem
+class LootTrackerItem implements Serializable
 {
 	@Getter
 	private final int id;

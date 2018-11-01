@@ -32,7 +32,15 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -92,8 +100,9 @@ class LootTrackerPanel extends PluginPanel
 	private final JLabel groupedLootBtn = new JLabel();
 
 	// Log collection
-	private final List<LootTrackerRecord> records = new ArrayList<>();
+	private List<LootTrackerRecord> records = new ArrayList<>();
 	private final List<LootTrackerBox> boxes = new ArrayList<>();
+	private List<String> trackedNames = new ArrayList<>();
 
 	private final ItemManager itemManager;
 	private final LootTrackerPlugin plugin;
@@ -283,21 +292,21 @@ class LootTrackerPanel extends PluginPanel
 		overallPanel.add(overallInfo, BorderLayout.CENTER);
 
 		// Create reset all menu
-		final JMenuItem reset = new JMenuItem("Reset All");
-		reset.addActionListener(e ->
-		{
-			// If not in detailed view, remove all, otherwise only remove for the currently detailed title
-			records.removeIf(r -> r.matches(currentView));
-			boxes.removeIf(b -> b.matches(currentView));
-			updateOverall();
-			logsContainer.removeAll();
-			logsContainer.repaint();
-		});
+//		final JMenuItem reset = new JMenuItem("Reset All");
+//		reset.addActionListener(e ->
+//		{
+//			// If not in detailed view, remove all, otherwise only remove for the currently detailed title
+//			records.removeIf(r -> r.matches(currentView));
+//			boxes.removeIf(b -> b.matches(currentView));
+//			updateOverall();
+//			logsContainer.removeAll();
+//			logsContainer.repaint();
+//		});
 
 		// Create popup menu
 		final JPopupMenu popupMenu = new JPopupMenu();
 		popupMenu.setBorder(new EmptyBorder(5, 5, 5, 5));
-		popupMenu.add(reset);
+//		popupMenu.add(reset);
 		overallPanel.setComponentPopupMenu(popupMenu);
 
 		// Create loot boxes wrapper
@@ -310,6 +319,28 @@ class LootTrackerPanel extends PluginPanel
 		// Add error pane
 		errorPanel.setContent("Loot trackers", "You have not received any loot yet.");
 		add(errorPanel);
+
+		// Read from file
+		try{
+			FileInputStream fis = new FileInputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\trackedNpcs.tmp");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			trackedNames = (List<String>) ois.readObject();
+			ois.close();
+
+		} catch (Exception e ) {
+			System.out.println(e.getMessage());
+		}
+
+		try{
+			FileInputStream fis = new FileInputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\items.tmp");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			records = (List<LootTrackerRecord>) ois.readObject();
+			ois.close();
+
+			rebuild();
+		} catch (Exception e ) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	void loadHeaderIcon(BufferedImage img)
@@ -326,12 +357,31 @@ class LootTrackerPanel extends PluginPanel
 	{
 		final String subTitle = actorLevel > -1 ? "(lvl-" + actorLevel + ")" : "";
 		final LootTrackerRecord record = new LootTrackerRecord(eventName, subTitle, items, System.currentTimeMillis());
+
 		records.add(record);
 		LootTrackerBox box = buildBox(record);
 		if (box != null)
 		{
 			box.rebuild();
 			updateOverall();
+		}
+
+		try
+		{
+			FileOutputStream fos = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\items.tmp");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			List<LootTrackerRecord> filteredRecords = new ArrayList<>();
+
+			for(LootTrackerRecord r : records) {
+				if (trackedNames.contains(r.getTitle())) {
+					filteredRecords.add(r);
+				}
+			}
+
+			oos.writeObject(filteredRecords);
+			oos.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -467,6 +517,68 @@ class LootTrackerPanel extends PluginPanel
 
 		popupMenu.add(details);
 
+		final JMenuItem track = new JMenuItem("Track");
+		final JMenuItem untrack = new JMenuItem("Untrack");
+
+
+		track.addActionListener(e ->
+		{
+			trackedNames.add(record.getTitle());
+			popupMenu.remove(track);
+			popupMenu.remove(reset);
+			popupMenu.add(untrack);
+			try
+			{
+				FileOutputStream npcOutput = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\trackedNpcs.tmp");
+				ObjectOutputStream npcObjectOutput = new ObjectOutputStream(npcOutput);
+
+				FileOutputStream itemsOutput = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\items.tmp");
+				ObjectOutputStream itemsObjectOutput = new ObjectOutputStream(itemsOutput);
+				List<LootTrackerRecord> filteredRecords = new ArrayList<>();
+
+				for(LootTrackerRecord r : records) {
+					if (trackedNames.contains(r.getTitle())) {
+						filteredRecords.add(r);
+					}
+				}
+
+				itemsObjectOutput.writeObject(filteredRecords);
+				itemsObjectOutput.close();
+				npcObjectOutput.writeObject(trackedNames);
+				npcObjectOutput.close();
+			} catch (Exception exc) {
+				System.out.println(exc.getMessage());
+			}
+			for(String s : trackedNames) {
+				System.out.println(s);
+			}
+		});
+
+
+		untrack.addActionListener(e ->
+		{
+			trackedNames.remove(record.getTitle());
+			popupMenu.remove(untrack);
+			popupMenu.add(track);
+			try
+			{
+				FileOutputStream fos = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\trackedNpcs.tmp");
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				oos.writeObject(trackedNames);
+				oos.close();
+			} catch (Exception exc) {
+				System.out.println(exc.getMessage());
+			}
+		});
+
+
+		if(trackedNames.contains(record.getTitle())) {
+			popupMenu.add(untrack);
+			popupMenu.remove(reset);
+		} else {
+			popupMenu.add(track);
+		}
+
 		// Add box to panel
 		boxes.add(box);
 		logsContainer.add(box, 0);
@@ -478,6 +590,7 @@ class LootTrackerPanel extends PluginPanel
 
 		return box;
 	}
+
 
 	private void updateOverall()
 	{
