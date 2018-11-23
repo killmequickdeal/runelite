@@ -322,7 +322,7 @@ class LootTrackerPanel extends PluginPanel
 
 		// Read from file
 		try{
-			FileInputStream fis = new FileInputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\trackedNpcs.tmp");
+			FileInputStream fis = new FileInputStream("C:\\Users\\Riley\\Documents\\GitHub\\trackedNpcs.tmp");
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			trackedNames = (List<String>) ois.readObject();
 			ois.close();
@@ -332,7 +332,7 @@ class LootTrackerPanel extends PluginPanel
 		}
 
 		try{
-			FileInputStream fis = new FileInputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\items.tmp");
+			FileInputStream fis = new FileInputStream("C:\\Users\\Riley\\Documents\\GitHub\\items.tmp");
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			records = (List<LootTrackerRecord>) ois.readObject();
 			ois.close();
@@ -368,7 +368,7 @@ class LootTrackerPanel extends PluginPanel
 
 		try
 		{
-			FileOutputStream fos = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\items.tmp");
+			FileOutputStream fos = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\items.tmp");
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			List<LootTrackerRecord> filteredRecords = new ArrayList<>();
 
@@ -529,10 +529,10 @@ class LootTrackerPanel extends PluginPanel
 			popupMenu.add(untrack);
 			try
 			{
-				FileOutputStream npcOutput = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\trackedNpcs.tmp");
+				FileOutputStream npcOutput = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\trackedNpcs.tmp");
 				ObjectOutputStream npcObjectOutput = new ObjectOutputStream(npcOutput);
 
-				FileOutputStream itemsOutput = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\items.tmp");
+				FileOutputStream itemsOutput = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\items.tmp");
 				ObjectOutputStream itemsObjectOutput = new ObjectOutputStream(itemsOutput);
 				List<LootTrackerRecord> filteredRecords = new ArrayList<>();
 
@@ -562,7 +562,7 @@ class LootTrackerPanel extends PluginPanel
 			popupMenu.add(track);
 			try
 			{
-				FileOutputStream fos = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\runelite\\trackedNpcs.tmp");
+				FileOutputStream fos = new FileOutputStream("C:\\Users\\Riley\\Documents\\GitHub\\trackedNpcs.tmp");
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				oos.writeObject(trackedNames);
 				oos.close();
